@@ -1,8 +1,10 @@
 package com.orbitbase.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
@@ -83,5 +85,35 @@ public class LaunchApiResponse {
         public static class LocationDto {
             private String name;
         }
+    }
+
+    // ── Astronaut DTOs ────────────────────────────────────────────────────────
+
+    @Data @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AstronautDto {
+        private Integer id;
+        private String name;
+        private List<NationalityDto> nationality;
+        private String bio;
+        @JsonProperty("date_of_birth")
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private LocalDate dateOfBirth;
+        private AgencyDto agency;                  // reuses existing AgencyDto
+        @JsonProperty("profile_image")
+        private String profileImage;
+    }
+
+    @Data @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class NationalityDto {
+        @JsonProperty("nationality_name")
+        private String nationalityName;
+    }
+
+    // Paginated envelope for GET /astronauts/ — mirrors LaunchApiResponse structure
+    @Data @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AstronautApiResponse {
+        private int count;
+        private String next;
+        private List<AstronautDto> results;
     }
 }

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>OrbitBase — Crew</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+        }
+
+        header {
+            background: #0d0d2b;
+            color: #ffffff;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        nav a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 0.9rem;
+        }
+
+        nav a:hover, nav a.active { color: #ffffff; }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+
+        .page-header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .btn-sync {
+            background: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-sync:hover { background: #1d4ed8; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #f8fafc; }
+
+        tbody td {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #e2e8f0;
+        }
+
+        .avatar-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: inline-block;
+        }
+
+        .name-cell { font-weight: 500; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state p { margin-bottom: 16px; font-size: 1rem; }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>&#127775; OrbitBase</h1>
+    <nav>
+        <a th:href="@{/launches}">Launches</a>
+        <a th:href="@{/crew}" class="active">Crew</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <div class="page-header">
+        <h2>Astronaut Crew</h2>
+        <a th:href="@{/crew/sync}" class="btn-sync">&#8635; Sync Now</a>
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${#lists.isEmpty(astronauts)}" class="empty-state">
+        <p>No astronauts synced yet.</p>
+        <a th:href="@{/crew/sync}" class="btn-sync">Sync from Launch Library 2</a>
+    </div>
+
+    <!-- Astronaut table -->
+    <table th:unless="${#lists.isEmpty(astronauts)}">
+        <thead>
+            <tr>
+                <th style="width:52px;"></th>
+                <th>Name</th>
+                <th>Nationality</th>
+                <th>Agency</th>
+                <th>Date of Birth</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="a : ${astronauts}">
+                <td>
+                    <img th:if="${a.profileImageUrl != null}"
+                         th:src="${a.profileImageUrl}"
+                         th:alt="${a.name}"
+                         class="avatar"/>
+                    <span th:unless="${a.profileImageUrl != null}" class="avatar-placeholder"></span>
+                </td>
+                <td class="name-cell" th:text="${a.name}">Name</td>
+                <td th:text="${a.nationality != null ? a.nationality : '—'}">Nationality</td>
+                <td th:text="${a.agencyName != null ? a.agencyName : '—'}">Agency</td>
+                <td th:text="${a.dateOfBirth != null ? a.dateOfBirth : '—'}">DOB</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<footer>
+    OrbitBase &mdash; PES University OOAD Mini Project &mdash; Data from Launch Library 2
+</footer>
+
+</body>
+</html>

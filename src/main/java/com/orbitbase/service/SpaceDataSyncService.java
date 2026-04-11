@@ -22,6 +22,7 @@ public class SpaceDataSyncService {
     private final MissionRepository missionRepo;
     private final AgencyRepository agencyRepo;
     private final RocketRepository rocketRepo;
+    private final AstronautRepository astronautRepo;
 
     private static final String BASE_URL = "https://ll.thespacedevs.com/2.3.0";
 
@@ -111,6 +112,43 @@ public class SpaceDataSyncService {
         r.setFamily(cfg.getFamily());
         r.setVariant(cfg.getVariant());
         return rocketRepo.save(r);
+    }
+
+    @Scheduled(fixedDelay = 3600000)
+    public void syncAstronauts() {
+        log.info("Starting astronaut sync...");
+        String url = BASE_URL + "/astronauts/?limit=25";
+
+        try {
+            AstronautApiResponse response = webClientBuilder.build()
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(AstronautApiResponse.class)
+                .block();
+
+            if (response == null || response.getResults() == null) return;
+
+            for (AstronautDto dto : response.getResults()) {
+                if (astronautRepo.existsByApiId(dto.getId())) continue;
+                Astronaut astronaut = new AstronautBuilder()
+                    .withApiId(dto.getId())
+                    .withName(dto.getName())
+                    .withNationality(dto.getNationality() != null && !dto.getNationality().isEmpty()
+                        ? dto.getNationality().get(0).getNationalityName() : null)
+                    .withBio(dto.getBio())
+                    .withDateOfBirth(dto.getDateOfBirth())
+                    .withAgencyName(dto.getAgency() != null ? dto.getAgency().getName() : null)
+                    .withProfileImageUrl(dto.getProfileImage())
+                    .build();
+                astronautRepo.save(astronaut);
+            }
+
+            log.info("Astronaut sync complete. Processed {} astronauts.", response.getResults().size());
+
+        } catch (Exception e) {
+            log.error("Astronaut sync failed: {}", e.getMessage());
+        }
     }
 
     private Mission resolveMission(MissionDto dto) {
