@@ -10,6 +10,7 @@ public class Mission {
 
     private String apiId;        // LL2 UUID
     private String name;
+    @Lob
     private String description;
     private String type;         // e.g. "Earth Science", "Communications"
     private String orbitName;    // e.g. "LEO", "GTO"

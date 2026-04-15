@@ -1,11 +1,13 @@
 package com.orbitbase.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Data @JsonIgnoreProperties(ignoreUnknown = true)
 public class LaunchApiResponse {
@@ -36,13 +38,26 @@ public class LaunchApiResponse {
     public static class MissionDto {
         private String name;
         private String description;
-        private TypeDto type;      // ← was String, now object
+        private TypeDto type;
         private OrbitDto orbit;
     }
 
     @Data @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TypeDto {
         private String name;
+
+        // API sometimes sends "Earth Science" (String), sometimes {"id":17,"name":"Earth Science"} (Object)
+        @JsonCreator
+        public static TypeDto fromValue(Object raw) {
+            TypeDto dto = new TypeDto();
+            if (raw instanceof String) {
+                dto.setName((String) raw);
+            } else if (raw instanceof Map) {
+                Object n = ((Map<?, ?>) raw).get("name");
+                if (n != null) dto.setName(n.toString());
+            }
+            return dto;
+        }
     }
 
     @Data @JsonIgnoreProperties(ignoreUnknown = true)
@@ -71,7 +86,7 @@ public class LaunchApiResponse {
         private Integer id;
         private String name;
         private String abbrev;
-        private TypeDto type;      // ← was String, now object
+        private TypeDto type;
     }
 
     @Data @JsonIgnoreProperties(ignoreUnknown = true)
@@ -98,7 +113,7 @@ public class LaunchApiResponse {
         @JsonProperty("date_of_birth")
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate dateOfBirth;
-        private AgencyDto agency;                  // reuses existing AgencyDto
+        private AgencyDto agency;
         @JsonProperty("profile_image")
         private String profileImage;
     }
@@ -109,7 +124,6 @@ public class LaunchApiResponse {
         private String nationalityName;
     }
 
-    // Paginated envelope for GET /astronauts/ — mirrors LaunchApiResponse structure
     @Data @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AstronautApiResponse {
         private int count;
