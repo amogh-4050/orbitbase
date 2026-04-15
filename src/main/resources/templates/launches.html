@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>OrbitBase — Launches</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; color: #1a1a2e; }
+        header { background: #0d0d2b; color: #fff; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; }
+        nav a { color: #a0aec0; text-decoration: none; margin-left: 24px; font-size: 0.9rem; }
+        nav a:hover, nav a.active { color: #fff; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+        .page-header h2 { font-size: 1.6rem; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+        thead { background: #f8fafc; }
+        thead th { text-align: left; padding: 12px 16px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #f8fafc; }
+        tbody td { padding: 12px 16px; font-size: 0.875rem; vertical-align: middle; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; }
+        .badge-success { background: #dcfce7; color: #16a34a; }
+        .badge-go { background: #dbeafe; color: #1d4ed8; }
+        .badge-other { background: #f1f5f9; color: #475569; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        footer { text-align: center; padding: 24px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid #f1f5f9; margin-top: 60px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>&#127775; OrbitBase</h1>
+    <nav>
+        <a th:href="@{/launches}" class="active">Launches</a>
+        <a th:href="@{/missions}">Missions</a>
+        <a th:href="@{/agencies}">Agencies</a>
+        <a th:href="@{/rockets}">Rockets</a>
+        <a th:href="@{/crew}">Crew</a>
+    </nav>
+</header>
+<div class="container">
+    <div class="page-header">
+        <h2>Launches</h2>
+    </div>
+    <div th:if="${#lists.isEmpty(launches)}" class="empty-state">
+        <p>No launches synced yet. The background sync runs every hour.</p>
+    </div>
+    <table th:unless="${#lists.isEmpty(launches)}">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Launch Time (NET)</th>
+                <th>Pad</th>
+                <th>Location</th>
+                <th>Agency</th>
+                <th>Mission</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="l : ${launches}">
+                <td th:text="${l.name}">—</td>
+                <td>
+                    <span th:text="${l.statusAbbrev != null ? l.statusAbbrev : '—'}"
+                          th:classappend="${l.statusAbbrev == 'Launch Successful' || l.statusAbbrev == 'Success'} ? 'badge badge-success' : (${l.statusAbbrev == 'Go'} ? 'badge badge-go' : 'badge badge-other')">
+                    </span>
+                </td>
+                <td th:text="${l.net != null ? l.net : '—'}">—</td>
+                <td th:text="${l.padName != null ? l.padName : '—'}">—</td>
+                <td th:text="${l.locationName != null ? l.locationName : '—'}">—</td>
+                <td th:text="${l.agency != null ? l.agency.name : '—'}">—</td>
+                <td th:text="${l.mission != null ? l.mission.name : '—'}">—</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<footer>OrbitBase &mdash; PES University OOAD Mini Project &mdash; Data from Launch Library 2</footer>
+</body>
+</html>
