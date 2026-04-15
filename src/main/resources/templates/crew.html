@@ -132,6 +132,45 @@
 
         .empty-state p { margin-bottom: 16px; font-size: 1rem; }
 
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-form input[type="text"] {
+            padding: 8px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            width: 240px;
+            outline: none;
+        }
+
+        .search-form input[type="text"]:focus {
+            border-color: #2563eb;
+        }
+
+        .btn-search {
+            background: #475569;
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .btn-search:hover { background: #334155; }
+
+        .btn-view {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .btn-view:hover { text-decoration: underline; }
+
         footer {
             text-align: center;
             padding: 24px;
@@ -159,6 +198,13 @@
         <a th:href="@{/crew/sync}" class="btn-sync">&#8635; Sync Now</a>
     </div>
 
+    <!-- Search form -->
+    <form th:action="@{/crew/search}" method="get" class="search-form">
+        <input type="text" name="nationality" placeholder="Filter by nationality..."
+               th:value="${query != null ? query : ''}"/>
+        <button type="submit" class="btn-search">Search</button>
+    </form>
+
     <!-- Empty state -->
     <div th:if="${#lists.isEmpty(astronauts)}" class="empty-state">
         <p>No astronauts synced yet.</p>
@@ -174,6 +220,7 @@
                 <th>Nationality</th>
                 <th>Agency</th>
                 <th>Date of Birth</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -189,6 +236,7 @@
                 <td th:text="${a.nationality != null ? a.nationality : '—'}">Nationality</td>
                 <td th:text="${a.agencyName != null ? a.agencyName : '—'}">Agency</td>
                 <td th:text="${a.dateOfBirth != null ? a.dateOfBirth : '—'}">DOB</td>
+                <td><a th:href="@{/crew/{id}(id=${a.id})}" class="btn-view">View</a></td>
             </tr>
         </tbody>
     </table>

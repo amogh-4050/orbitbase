@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>OrbitBase — Astronaut Detail</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+        }
+
+        header {
+            background: #0d0d2b;
+            color: #ffffff;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        nav a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 0.9rem;
+        }
+
+        nav a:hover, nav a.active { color: #ffffff; }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover { text-decoration: underline; }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-top {
+            background: #f8fafc;
+            padding: 32px;
+            display: flex;
+            gap: 28px;
+            align-items: flex-start;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .profile-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .card-top-info h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .meta-item strong {
+            color: #1a1a2e;
+        }
+
+        .card-body {
+            padding: 28px 32px;
+        }
+
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .field-value {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #1a1a2e;
+        }
+
+        .not-available { color: #94a3b8; font-style: italic; }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>&#127775; OrbitBase</h1>
+    <nav>
+        <a th:href="@{/launches}">Launches</a>
+        <a th:href="@{/crew}" class="active">Crew</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <a th:href="@{/crew}" class="back-link">&#8592; Back to Crew</a>
+
+    <div th:if="${astronaut == null}">
+        <p>Astronaut not found.</p>
+    </div>
+
+    <div th:unless="${astronaut == null}" class="card">
+        <div class="card-top">
+            <img th:if="${astronaut.profileImageUrl != null}"
+                 th:src="${astronaut.profileImageUrl}"
+                 th:alt="${astronaut.name}"
+                 class="profile-img"/>
+            <div th:unless="${astronaut.profileImageUrl != null}" class="profile-placeholder"></div>
+
+            <div class="card-top-info">
+                <h2 th:text="${astronaut.name}">Name</h2>
+                <div class="meta">
+                    <span class="meta-item">
+                        <strong>Nationality: </strong>
+                        <span th:text="${astronaut.nationality != null ? astronaut.nationality : 'Unknown'}">—</span>
+                    </span>
+                    <span class="meta-item">
+                        <strong>Agency: </strong>
+                        <span th:text="${astronaut.agencyName != null ? astronaut.agencyName : 'Unknown'}">—</span>
+                    </span>
+                    <span class="meta-item">
+                        <strong>Date of Birth: </strong>
+                        <span th:text="${astronaut.dateOfBirth != null ? astronaut.dateOfBirth : 'Unknown'}">—</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="field-group">
+                <div class="field-label">Biography</div>
+                <div class="field-value"
+                     th:text="${astronaut.bio != null ? astronaut.bio : 'No biography available.'}"
+                     th:classappend="${astronaut.bio == null ? 'not-available' : ''}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    OrbitBase &mdash; PES University OOAD Mini Project &mdash; Data from Launch Library 2
+</footer>
+
+</body>
+</html>
