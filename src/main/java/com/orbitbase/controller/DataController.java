@@ -4,6 +4,7 @@ import com.orbitbase.repository.AgencyRepository;
 import com.orbitbase.repository.LaunchRepository;
 import com.orbitbase.repository.MissionRepository;
 import com.orbitbase.repository.RocketRepository;
+import com.orbitbase.service.OrbitDataFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ public class DataController {
     private final AgencyRepository agencyRepository;
     private final MissionRepository missionRepository;
     private final RocketRepository rocketRepository;
+    private final OrbitDataFacade orbitDataFacade;
 
     @GetMapping("/launches")
     public String launches(Model model) {
@@ -40,5 +42,11 @@ public class DataController {
     public String rockets(Model model) {
         model.addAttribute("rockets", rocketRepository.findAll());
         return "rockets";
+    }
+
+    @GetMapping({"/", "/dashboard"})
+    public String dashboard(Model model) {
+        model.addAttribute("summary", orbitDataFacade.getDashboardSummary());
+        return "dashboard";
     }
 }
