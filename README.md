@@ -268,9 +268,8 @@ After that, all pages will show live data.
 
 | Member | Use Case | Pattern | Principle |
 |--------|----------|---------|-----------|
-| Abhinav W | Astronaut / Crew sync, display, search, sort | Builder, Strategy, Facade | DIP, SRP, ISP, OCP |
-| Amogh | Launch / Mission / Agency / Rocket sync | _(pattern)_ | _(principle)_ |
-| _(T3)_ | _(feature)_ | _(pattern)_ | _(principle)_ |
-| _(T4)_ | _(feature)_ | _(pattern)_ | _(principle)_ |
+| Abhinav W | Astronaut / Crew — sync, display, search, sort, detail page | Builder (Creational), Strategy (Behavioral) | DIP, ISP |
+| Amogh | Launches / Missions — sync, display pages | Facade (Structural) | SRP |
+| Aman | Agencies / Rockets / Dashboard — display pages, dashboard summary | Front Controller (Framework-enforced via Spring DispatcherServlet) | OCP |
 
 Data sourced from [The Space Devs — Launch Library 2](https://thespacedevs.com/llapi).
