@@ -16,6 +16,7 @@ Built as a PES University UE23CS352B (OOAD) Mini Project demonstrating MVC archi
 - [Prerequisites](#prerequisites)
 - [Setup and Running](#setup-and-running)
 - [MVC Architecture](#mvc-architecture)
+- [Class Diagram](#class-diagram)
 - [Pages Reference](#pages-reference)
 - [Team](#team)
 
@@ -247,6 +248,12 @@ After that, all pages will show live data.
 ## MVC Architecture
 
 ![MVC Architecture](docs/mvc-architecture.png)
+
+---
+
+## Class Diagram
+
+![Class Diagram](docs/class-diagram.jpeg)
 
 The application follows a strict layered MVC architecture enforced by Spring Boot:
 
