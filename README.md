@@ -289,9 +289,9 @@ The application follows a strict layered MVC architecture enforced by Spring Boo
 
 | Member | SRN | Use Case | Pattern | Principle |
 |--------|-----|----------|---------|-----------|
-| Abhinav W | | Astronaut / Crew — sync, display, search, sort, detail page | Builder (Creational), Strategy (Behavioral) | DIP, ISP |
-| Amogh | | Launches / Missions — sync, display pages | Facade (Structural) | SRP |
-| Aman | | Agencies / Rockets / Dashboard — display pages, dashboard summary | Front Controller (Framework-enforced via Spring DispatcherServlet) | OCP |
-| Harshith | | Security & Config — `SecurityConfig`, `application.properties` templating, DB schema design, entity relationship modelling | Singleton (Spring-managed beans) | LSP |
+| Abhinav W | PES1UG23CS016 | Astronaut / Crew — sync, display, search, sort, detail page | Builder (Creational), Strategy (Behavioral) | DIP, ISP |
+| Amogh Singh | PES1UG23CS061 | Launches / Missions — sync, display pages | Facade (Structural) | SRP |
+| Aman Das | PES1UG23CS056 | Agencies / Rockets / Dashboard — display pages, dashboard summary | Front Controller (Framework-enforced via Spring DispatcherServlet) | OCP |
+| Akshath Singh | PES1UG23CS048 | Security & Config — `SecurityConfig`, `application.properties` templating, DB schema design, entity relationship modelling | Singleton (Spring-managed beans) | LSP |
 
 Data sourced from [The Space Devs — Launch Library 2](https://thespacedevs.com/llapi).
