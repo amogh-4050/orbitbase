@@ -22,6 +22,8 @@ public class SpaceDataSyncService {
     private final MissionRepository missionRepo;
     private final AgencyRepository agencyRepo;
     private final RocketRepository rocketRepo;
+    private final AstronautRepository astronautRepo;
+    private final AstronautMapper astronautMapper;
 
     private static final String BASE_URL = "https://ll.thespacedevs.com/2.3.0";
 
@@ -111,6 +113,33 @@ public class SpaceDataSyncService {
         r.setFamily(cfg.getFamily());
         r.setVariant(cfg.getVariant());
         return rocketRepo.save(r);
+    }
+
+    @Scheduled(fixedDelay = 3600000)
+    public void syncAstronauts() {
+        log.info("Starting astronaut sync...");
+        String url = BASE_URL + "/astronauts/?limit=25";
+
+        try {
+            AstronautApiResponse response = webClientBuilder.build()
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(AstronautApiResponse.class)
+                .block();
+
+            if (response == null || response.getResults() == null) return;
+
+            for (AstronautDto dto : response.getResults()) {
+                if (astronautRepo.existsByApiId(dto.getId())) continue;
+                astronautRepo.save(astronautMapper.toEntity(dto));
+            }
+
+            log.info("Astronaut sync complete. Processed {} astronauts.", response.getResults().size());
+
+        } catch (Exception e) {
+            log.error("Astronaut sync failed: {}", e.getMessage());
+        }
     }
 
     private Mission resolveMission(MissionDto dto) {

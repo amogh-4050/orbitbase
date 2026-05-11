@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>OrbitBase — Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; color: #1a1a2e; }
+        header { background: #0d0d2b; color: #fff; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+        header h1 { font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; }
+        nav a { color: #a0aec0; text-decoration: none; margin-left: 24px; font-size: 0.9rem; }
+        nav a:hover, nav a.active { color: #fff; }
+        .container { max-width: 1000px; margin: 48px auto; padding: 0 24px; }
+        .page-header { margin-bottom: 36px; }
+        .page-header h2 { font-size: 1.8rem; font-weight: 700; }
+        .page-header p { margin-top: 6px; color: #64748b; font-size: 0.95rem; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 28px 24px;
+            text-decoration: none;
+            color: inherit;
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+        .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+        .card-icon { font-size: 2rem; margin-bottom: 12px; }
+        .card-count { font-size: 2.4rem; font-weight: 700; color: #0d0d2b; line-height: 1; }
+        .card-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-top: 6px; }
+        footer { text-align: center; padding: 24px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid #f1f5f9; margin-top: 80px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>&#127775; OrbitBase</h1>
+    <nav>
+        <a th:href="@{/dashboard}" class="active">Dashboard</a>
+        <a th:href="@{/launches}">Launches</a>
+        <a th:href="@{/missions}">Missions</a>
+        <a th:href="@{/agencies}">Agencies</a>
+        <a th:href="@{/rockets}">Rockets</a>
+        <a th:href="@{/crew}">Crew</a>
+    </nav>
+</header>
+<div class="container">
+    <div class="page-header">
+        <h2>Dashboard</h2>
+        <p>Live counts from the OrbitBase database</p>
+    </div>
+    <div class="cards">
+        <a th:href="@{/launches}" class="card">
+            <div class="card-icon">&#128640;</div>
+            <div class="card-count" th:text="${summary.totalLaunches}">0</div>
+            <div class="card-label">Launches</div>
+        </a>
+        <a th:href="@{/missions}" class="card">
+            <div class="card-icon">&#127760;</div>
+            <div class="card-count" th:text="${summary.totalMissions}">0</div>
+            <div class="card-label">Missions</div>
+        </a>
+        <a th:href="@{/agencies}" class="card">
+            <div class="card-icon">&#127963;</div>
+            <div class="card-count" th:text="${summary.totalAgencies}">0</div>
+            <div class="card-label">Agencies</div>
+        </a>
+        <a th:href="@{/rockets}" class="card">
+            <div class="card-icon">&#128970;</div>
+            <div class="card-count" th:text="${summary.totalRockets}">0</div>
+            <div class="card-label">Rockets</div>
+        </a>
+        <a th:href="@{/crew}" class="card">
+            <div class="card-icon">&#128104;&#8205;&#128640;</div>
+            <div class="card-count" th:text="${summary.totalAstronauts}">0</div>
+            <div class="card-label">Astronauts</div>
+        </a>
+    </div>
+</div>
+<footer>OrbitBase &mdash; PES University OOAD Mini Project &mdash; Data from Launch Library 2</footer>
+</body>
+</html>
