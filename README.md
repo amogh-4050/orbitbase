@@ -15,6 +15,7 @@ Built as a PES University UE23CS352B (OOAD) Mini Project demonstrating MVC archi
 - [SOLID Principles](#solid-principles)
 - [Prerequisites](#prerequisites)
 - [Setup and Running](#setup-and-running)
+- [MVC Architecture](#mvc-architecture)
 - [Pages Reference](#pages-reference)
 - [Team](#team)
 
@@ -243,6 +244,19 @@ After that, all pages will show live data.
 
 ---
 
+## MVC Architecture
+
+![MVC Architecture](docs/mvc-architecture.png)
+
+The application follows a strict layered MVC architecture enforced by Spring Boot:
+
+- **View** — Thymeleaf templates render HTML; each entity has its own template (`launches.html`, `crew.html`, etc.)
+- **Controller** — `@RestController` / `@Controller` classes map HTTP verbs to service calls and return `ModelAndView` or JSON
+- **Service** — Business logic, design patterns, and `@Transactional` boundaries live here
+- **Repository** — Spring Data JPA `JpaRepository<Entity, Long>` auto-generates SQL; custom `@Query` methods added where needed
+
+---
+
 ## Pages Reference
 
 | URL | What you see |
@@ -266,10 +280,11 @@ After that, all pages will show live data.
 
 **PES University — UE23CS352B Object Oriented Analysis & Design**
 
-| Member | Use Case | Pattern | Principle |
-|--------|----------|---------|-----------|
-| Abhinav W | Astronaut / Crew — sync, display, search, sort, detail page | Builder (Creational), Strategy (Behavioral) | DIP, ISP |
-| Amogh | Launches / Missions — sync, display pages | Facade (Structural) | SRP |
-| Aman | Agencies / Rockets / Dashboard — display pages, dashboard summary | Front Controller (Framework-enforced via Spring DispatcherServlet) | OCP |
+| Member | SRN | Use Case | Pattern | Principle |
+|--------|-----|----------|---------|-----------|
+| Abhinav W | | Astronaut / Crew — sync, display, search, sort, detail page | Builder (Creational), Strategy (Behavioral) | DIP, ISP |
+| Amogh | | Launches / Missions — sync, display pages | Facade (Structural) | SRP |
+| Aman | | Agencies / Rockets / Dashboard — display pages, dashboard summary | Front Controller (Framework-enforced via Spring DispatcherServlet) | OCP |
+| Harshith | | Security & Config — `SecurityConfig`, `application.properties` templating, DB schema design, entity relationship modelling | Singleton (Spring-managed beans) | LSP |
 
 Data sourced from [The Space Devs — Launch Library 2](https://thespacedevs.com/llapi).
