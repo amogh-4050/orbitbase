@@ -17,6 +17,8 @@ Built as a PES University UE23CS352B (OOAD) Mini Project demonstrating MVC archi
 - [Setup and Running](#setup-and-running)
 - [MVC Architecture](#mvc-architecture)
 - [Class Diagram](#class-diagram)
+- [JWT Authentication](#jwt-authentication)
+- [Swagger UI](#swagger-ui)
 - [Pages Reference](#pages-reference)
 - [Team](#team)
 
@@ -35,6 +37,10 @@ Built as a PES University UE23CS352B (OOAD) Mini Project demonstrating MVC archi
 | Build Tool | Maven (mvnw wrapper included) |
 | Utilities | Lombok |
 | Data Source | Launch Library 2 API v2.3.0 |
+| Auth | JWT (jjwt 0.12.5, HS256) |
+| API Docs | springdoc-openapi + Swagger UI 2.3.0 |
+| Connection Pool | HikariCP (pool=10, timeout=30s) |
+| Caching | Spring Cache (`@Cacheable`) |
 
 ---
 
@@ -47,6 +53,10 @@ Built as a PES University UE23CS352B (OOAD) Mini Project demonstrating MVC archi
 - Full **astronaut detail page** with profile image, bio, agency, DOB
 - Pages for all 5 tables: Launches, Missions, Agencies, Rockets, Crew
 - Duplicate-safe sync — re-running never creates duplicate rows
+- JWT authentication — register/login via `/api/auth/*`, token valid 24h
+- Swagger UI at `/swagger-ui.html` with JWT bearer auth support
+- HikariCP connection pool (size 10, 30s timeout, 600s idle)
+- Launch sync cached with `@Cacheable("launches")` to avoid redundant API calls
 
 ---
 
@@ -55,10 +65,12 @@ Built as a PES University UE23CS352B (OOAD) Mini Project demonstrating MVC archi
 ```
 src/main/java/com/orbitbase/
 ├── config/
-│   └── SecurityConfig.java              # Permits all requests (demo config)
+│   ├── OpenApiConfig.java               # Swagger UI + JWT bearer auth scheme
+│   └── SecurityConfig.java             # JWT filter chain, public/protected route rules
 ├── controller/
+│   ├── AuthController.java              # POST /api/auth/register, POST /api/auth/login
 │   ├── CrewController.java              # /crew endpoints
-│   └── DataController.java              # /dashboard, /launches, /missions, /agencies, /rockets
+│   └── DataController.java             # /dashboard, /launches, /missions, /agencies, /rockets
 ├── dto/
 │   └── LaunchApiResponse.java           # Jackson DTOs mapping LL2 API JSON responses
 ├── model/
@@ -66,13 +78,20 @@ src/main/java/com/orbitbase/
 │   ├── Astronaut.java
 │   ├── Launch.java
 │   ├── Mission.java
-│   └── Rocket.java
+│   ├── Rocket.java
+│   ├── Role.java                        # Enum: ADMIN, SCIENTIST, VIEWER
+│   └── User.java                        # Auth user entity
 ├── repository/
 │   ├── AgencyRepository.java
 │   ├── AstronautRepository.java
 │   ├── LaunchRepository.java
 │   ├── MissionRepository.java
-│   └── RocketRepository.java
+│   ├── RocketRepository.java
+│   └── UserRepository.java              # findByUsername
+├── security/
+│   ├── CustomUserDetailsService.java    # Loads User from DB for Spring Security
+│   ├── JwtAuthenticationFilter.java     # Extracts + validates Bearer token per request
+│   └── JwtTokenProvider.java           # Generates and validates JWT tokens (HS256, 24h)
 └── service/
     ├── AstronautBuilder.java            # GoF Builder pattern
     ├── AstronautMapper.java             # SRP — owns DTO → Entity conversion
@@ -211,11 +230,22 @@ Open `src/main/resources/application.properties` and set your MySQL password:
 spring.datasource.url=jdbc:mysql://localhost:3306/orbitbase
 spring.datasource.username=root
 spring.datasource.password=YOUR_PASSWORD_HERE
+
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.idle-timeout=600000
+
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 spring.thymeleaf.cache=false
 server.port=8080
+
+# Generate with: openssl rand -base64 32
+jwt.secret=YOUR_BASE64_SECRET_HERE
+
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.api-docs.path=/v3/api-docs
+springdoc.swagger-ui.tryItOutEnabled=true
 ```
 
 ### 4. Run the application
@@ -264,6 +294,46 @@ The application follows a strict layered MVC architecture enforced by Spring Boo
 
 ---
 
+## JWT Authentication
+
+All `/api/**` routes (except `/api/auth/**`) require a valid JWT Bearer token.
+
+**Register:**
+```bash
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"yourname","password":"yourpass","email":"you@example.com"}'
+```
+
+**Login:**
+```bash
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"yourname","password":"yourpass"}'
+```
+
+Both return `{"token":"<jwt>"}`. Pass it in subsequent requests:
+```
+Authorization: Bearer <token>
+```
+
+Tokens expire after **24 hours**. New users are assigned `VIEWER` role by default. Available roles: `ADMIN`, `SCIENTIST`, `VIEWER`.
+
+---
+
+## Swagger UI
+
+Interactive API docs are available at:
+```
+http://localhost:8080/swagger-ui.html
+```
+
+- Click **Authorize** (top right) and paste your JWT token to authenticate
+- All endpoints are grouped by tag — **Authentication** and **Launch Data**
+- Use **Try it out** to call endpoints directly from the browser
+
+---
+
 ## Pages Reference
 
 | URL | What you see |
@@ -280,6 +350,9 @@ The application follows a strict layered MVC architecture enforced by Spring Boo
 | `http://localhost:8080/crew/{id}` | Full detail page for one astronaut |
 | `http://localhost:8080/crew/search?nationality=American` | Filtered astronaut list |
 | `http://localhost:8080/crew/sync` | Trigger manual sync, redirects to /crew |
+| `http://localhost:8080/swagger-ui.html` | Interactive API docs with JWT auth support |
+| `http://localhost:8080/api/auth/register` | `POST` — register a new user, returns JWT |
+| `http://localhost:8080/api/auth/login` | `POST` — login with credentials, returns JWT |
 
 ---
 
@@ -295,3 +368,14 @@ The application follows a strict layered MVC architecture enforced by Spring Boo
 | Harshith | | Security & Config — `SecurityConfig`, `application.properties` templating, DB schema design, entity relationship modelling | Singleton (Spring-managed beans) | LSP |
 
 Data sourced from [The Space Devs — Launch Library 2](https://thespacedevs.com/llapi).
+
+---
+
+## TODO
+
+> **Security — replace JWT secret before any deployment**
+> The `jwt.secret` in `application.properties` is a dev placeholder. Generate a real key and replace it:
+> ```bash
+> openssl rand -base64 32
+> ```
+> Then update `jwt.secret=<output>` in `application.properties`.
