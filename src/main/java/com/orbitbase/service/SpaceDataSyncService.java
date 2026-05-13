@@ -6,6 +6,7 @@ import com.orbitbase.model.*;
 import com.orbitbase.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,6 +28,7 @@ public class SpaceDataSyncService {
 
     private static final String BASE_URL = "https://ll.thespacedevs.com/2.3.0";
 
+    @Cacheable("launches")
     @Scheduled(fixedDelay = 3600000)
     public void syncLaunches() {
         log.info("Starting Launch Library 2 sync...");
