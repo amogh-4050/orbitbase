@@ -26,6 +26,12 @@
         .badge-go { background: #dbeafe; color: #1d4ed8; }
         .badge-other { background: #f1f5f9; color: #475569; }
         .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .search-form { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .search-form input { flex: 1; min-width: 180px; padding: 8px 14px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.875rem; outline: none; }
+        .search-form input:focus { border-color: #6366f1; }
+        .search-form button { padding: 8px 20px; background: #0d0d2b; color: #fff; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer; }
+        .search-form button:hover { background: #1a1a4e; }
+        .search-form a { padding: 8px 16px; color: #64748b; font-size: 0.875rem; text-decoration: none; align-self: center; }
         footer { text-align: center; padding: 24px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid #f1f5f9; margin-top: 60px; }
     </style>
 </head>
@@ -33,6 +39,7 @@
 <header>
     <h1>&#127775; OrbitBase</h1>
     <nav>
+        <a th:href="@{/dashboard}">Dashboard</a>
         <a th:href="@{/launches}" class="active">Launches</a>
         <a th:href="@{/missions}">Missions</a>
         <a th:href="@{/agencies}">Agencies</a>
@@ -44,6 +51,12 @@
     <div class="page-header">
         <h2>Launches</h2>
     </div>
+    <form class="search-form" th:action="@{/launches}" method="get">
+        <input type="text" name="agency" placeholder="Filter by agency (e.g. SpaceX)" th:value="${agency}"/>
+        <input type="text" name="status" placeholder="Filter by status (e.g. TBD, Go, Launch Successful)" th:value="${status}"/>
+        <button type="submit">Search</button>
+        <a th:href="@{/launches}">Clear</a>
+    </form>
     <div th:if="${#lists.isEmpty(launches)}" class="empty-state">
         <p>No launches synced yet. The background sync runs every hour.</p>
     </div>
@@ -67,7 +80,7 @@
                           th:classappend="${l.statusAbbrev == 'Launch Successful' || l.statusAbbrev == 'Success'} ? 'badge badge-success' : (${l.statusAbbrev == 'Go'} ? 'badge badge-go' : 'badge badge-other')">
                     </span>
                 </td>
-                <td th:text="${l.net != null ? l.net : '—'}">—</td>
+                <td th:text="${l.net != null ? #temporals.format(l.net.atZone(T(java.time.ZoneOffset).UTC), 'dd MMM yyyy HH:mm') + ' UTC' : '—'}">—</td>
                 <td th:text="${l.padName != null ? l.padName : '—'}">—</td>
                 <td th:text="${l.locationName != null ? l.locationName : '—'}">—</td>
                 <td th:text="${l.agency != null ? l.agency.name : '—'}">—</td>

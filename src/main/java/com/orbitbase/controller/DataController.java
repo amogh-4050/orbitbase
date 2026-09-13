@@ -4,6 +4,7 @@ import com.orbitbase.repository.AgencyRepository;
 import com.orbitbase.repository.LaunchRepository;
 import com.orbitbase.repository.MissionRepository;
 import com.orbitbase.repository.RocketRepository;
+import com.orbitbase.service.LaunchService;
 import com.orbitbase.service.OrbitDataFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,15 +20,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class DataController {
 
     private final LaunchRepository launchRepository;
+    private final LaunchService launchService;
     private final AgencyRepository agencyRepository;
     private final MissionRepository missionRepository;
     private final RocketRepository rocketRepository;
     private final OrbitDataFacade orbitDataFacade;
 
-    @Operation(summary = "Launches page", description = "Lists all synced launches from Launch Library 2")
+    @Operation(summary = "Launches page", description = "Lists launches, optionally filtered by agency name and status")
     @GetMapping("/launches")
-    public String launches(Model model) {
-        model.addAttribute("launches", launchRepository.findAll());
+    public String launches(@RequestParam(required = false) String agency,
+                           @RequestParam(required = false) String status,
+                           Model model) {
+        boolean filtering = (agency != null && !agency.isBlank()) || (status != null && !status.isBlank());
+        model.addAttribute("launches", filtering
+                ? launchService.searchLaunches(
+                        (agency != null && !agency.isBlank()) ? agency : null,
+                        (status != null && !status.isBlank()) ? status : null)
+                : launchService.getAllLaunches());
+        model.addAttribute("agency", agency != null ? agency : "");
+        model.addAttribute("status", status != null ? status : "");
         return "launches";
     }
 
