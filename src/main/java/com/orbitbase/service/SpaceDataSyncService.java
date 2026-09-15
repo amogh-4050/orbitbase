@@ -6,6 +6,7 @@ import com.orbitbase.model.*;
 import com.orbitbase.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,11 +28,15 @@ public class SpaceDataSyncService {
 
     private static final String BASE_URL = "https://ll.thespacedevs.com/2.3.0";
 
+    @CacheEvict(value = "launches", allEntries = true)
     @Scheduled(fixedDelay = 3600000)
     public void syncLaunches() {
-        log.info("Starting Launch Library 2 sync...");
-        String url = BASE_URL + "/launches/?limit=25&ordering=-net";
+        log.info("Starting launch sync (upcoming + previous)...");
+        syncFromUrl(BASE_URL + "/launches/?limit=25&ordering=net", "upcoming");
+        syncFromUrl(BASE_URL + "/launches/previous/?limit=25&ordering=-net", "previous");
+    }
 
+    private void syncFromUrl(String url, String label) {
         try {
             LaunchApiResponse response = webClientBuilder.build()
                 .get()
@@ -42,15 +47,18 @@ public class SpaceDataSyncService {
 
             if (response == null || response.getResults() == null) return;
 
+            int saved = 0;
             for (LaunchDto dto : response.getResults()) {
                 if (launchRepo.existsByApiId(dto.getId())) continue;
                 persistLaunch(dto);
+                saved++;
             }
 
-            log.info("Sync complete. Processed {} launches.", response.getResults().size());
+            log.info("Launch sync [{}] complete. Saved {}/{} launches.",
+                    label, saved, response.getResults().size());
 
         } catch (Exception e) {
-            log.error("Sync failed: {}", e.getMessage());
+            log.error("Launch sync [{}] failed: {}", label, e.getMessage());
         }
     }
 
